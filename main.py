@@ -70,7 +70,6 @@ class Paddle:
     def get_rect(self):
         return pygame.Rect(self.x, self.y, self.width, self.height)
     
-    
 class Balls:
     def __init__(self, x = None, y = None):
         self.x = x if x is not None else SCREEN_WIDTH // 2
@@ -103,7 +102,48 @@ class Balls:
     def get_rect(self):
         return pygame.Rect(self.x - self.radius, self.y - self.radius, 
                           2 * self.radius, 2 * self.radius)
+
+class Bricks:
+    def __init__(self, x, y, color):
+        self.x = x
+        self.y = y
+        self.width = BRICK_WIDTH
+        self.height = BRICK_HEIGHT
+        self.color = color
+        self.active = True
+        self.hit_count = 0
+        self.max_hits = 1
+        
+        if color == RED:
+            self.max_hits = 2
+
+    def draw(self):
+        if not self.active:
+            return
     
+        pygame.draw.rect(screen, self.color, 
+                            (self.x, self.y, self.width, self.height), 
+                            border_radius=3)
+        pygame.draw.rect(screen, tuple(min(c + 40, 255) for c in self.color), 
+                            (self.x, self.y, self.width, self.height), 2, border_radius=3)
+        
+        if self.hit_count > 0:
+            crack_color = (50,50,5)
+            pygame.draw.line(screen, crack_color, 
+                            (self.x + self.width // 4, self.y + self.height // 4), 
+                            (self.x + 3 * self.width // 4, self.y + 3 * self.height // 4), 2)
+            pygame.draw.line(screen, crack_color, 
+                            (self.x + 3 * self.width // 4, self.y + self.height // 4), 
+                            (self.x + self.width // 4, self.y + 3 * self.height // 4), 2)
+
+    def get_rect(self):
+        return pygame.Rect(self.x, self.y, self.width, self.height)
+    
+    def hit(self):
+        self.hit_count += 1
+        if self.hit_count >= self.max_hits:
+            self.active = False
+
 class Game:  # Main controller class
     
     def __init__(self):
@@ -114,9 +154,20 @@ class Game:  # Main controller class
         self.game_over = False 
         self.game_won = False
         self.balls = [Balls()]
+        self.bricks = []
         
         self.font = pygame.font.SysFont(None, 36) 
         self.small_font = pygame.font.SysFont(None, 24) 
+    
+    def create_bricks(self):
+        self.bricks = []
+        colors = [RED, ORANGE, YELLOW, GREEN, CYAN]
+        for row in range(BRICK_ROWS):
+            for col in range(BRICK_COLS):
+                x = col * (BRICK_WIDTH + BRICK_PADDING) + BRICK_PADDING
+                y = row * (BRICK_HEIGHT + BRICK_PADDING) + BRICK_OFFSET_TOP
+                color = colors[row % len(colors)]
+                self.bricks.append(Bricks(x, y, color))
     
     def collision_detection(self):
         for ball in self.balls:
@@ -128,12 +179,28 @@ class Game:  # Main controller class
                 bounce = relative_intersect_x * 0.8
                 ball.speed_x = -BALL_SPEED_X * relative_intersect_x * 1.5
                 ball.speed_y *= -1.1
+                
+        for brick in self.bricks:
+            if not brick.active:
+                continue
+            for ball in self.balls:
+                if not ball.active:
+                    continue
+                if ball.get_rect().colliderect(brick.get_rect()):
+                    brick.hit()
+                    self.score += 10
+                    if abs(ball.x - brick.x) < ball.radius or abs(ball.x - (brick.x + brick.width)) < ball.radius:
+                        ball.speed_x *= -1
+                    else:
+                        ball.speed_y *= -1
     def update(self):
         if self.game_over or self.game_won:  # If game ended
             return  # Don't update anything
             
         # Move paddle based on key states
         self.paddle.move()
+        
+        
         for ball in self.balls:
             ball.move()
         self.collision_detection()
@@ -149,6 +216,13 @@ class Game:  # Main controller class
             else:
                 self.balls.append(Balls())  # Add a new ball to start again
                 
+        if all(not brick.active for brick in self.bricks):  # If all bricks are destroyed
+            self.level += 1
+            # if self.level > 3:  # Win after 3 levels
+            #     self.game_won = True
+            # else:
+            self.create_bricks()  # Create new bricks for next level
+        
     def draw(self):
         screen.fill(BLACK)
         
@@ -161,6 +235,9 @@ class Game:  # Main controller class
         self.paddle.draw() 
         for ball in self.balls:
             ball.draw()
+        
+        for brick in self.bricks:
+            brick.draw()
         
         # Draw UI text
         score_text = self.font.render(f"Score: {self.score}", True, WHITE)
