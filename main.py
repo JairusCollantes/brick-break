@@ -13,7 +13,7 @@ PADDLE_HEIGHT = 15
 PADDLE_SPEED = 8
 BALL_RADIUS = 10
 BALL_SPEED_X = 5
-BALL_SPEED_Y = -5
+BALL_SPEED_Y = 5
 BRICK_WIDTH = 70
 BRICK_HEIGHT = 25
 BRICK_ROWS = 5
@@ -79,14 +79,26 @@ class Balls:
         self.speed_x = BALL_SPEED_X * random.choice([-1, 1])
         self.speed_y = BALL_SPEED_Y
         self.color = WHITE
+        self.active = True
 
     def draw(self):
-        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
-        pygame.draw.circle(screen, YELLOW, (int(self.x - self.radius // 3), int(self.y - self.radius // 3)), self.radius // 3, 2)
+        if self.active:
+            pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
+            pygame.draw.circle(screen, YELLOW, (int(self.x - self.radius // 3), int(self.y - self.radius // 3)), self.radius // 3, 2)
 
     def move(self):
+        if not self.active:
+            return
         self.x += self.speed_x
         self.y += self.speed_y
+        
+        if self.x <= self.radius or self.x >= SCREEN_WIDTH - self.radius:  
+            self.speed_x *= -1
+        if self.y <= self.radius:   
+            self.speed_y *= -1
+        
+        if self.y >= SCREEN_HEIGHT + self.radius:  
+            self.active = False
 
     def get_rect(self):
         return pygame.Rect(self.x - self.radius, self.y - self.radius, 
@@ -101,16 +113,41 @@ class Game:  # Main controller class
         self.level = 1 
         self.game_over = False 
         self.game_won = False
-
+        self.balls = [Balls()]
+        
         self.font = pygame.font.SysFont(None, 36) 
         self.small_font = pygame.font.SysFont(None, 24) 
+    
+    def collision_detection(self):
+        for ball in self.balls:
+            if not ball.active:
+                continue
             
+            if ball.get_rect().colliderect(self.paddle.get_rect()):
+                relative_intersect_x = (self.paddle.x + (self.paddle.width // 2) - ball.x) / self.paddle.width
+                bounce = relative_intersect_x * 0.8
+                ball.speed_x = -BALL_SPEED_X * relative_intersect_x * 1.5
+                ball.speed_y *= -1.1
     def update(self):
         if self.game_over or self.game_won:  # If game ended
             return  # Don't update anything
             
         # Move paddle based on key states
         self.paddle.move()
+        for ball in self.balls:
+            ball.move()
+        self.collision_detection()
+        
+        ball = 0
+        for balls in self.balls:
+            if balls.active:
+                ball += 1
+        if ball == 0:  # If all balls are lost
+            self.lives -= 1
+            if self.lives <= 0:
+                self.game_over = True
+            else:
+                self.balls.append(Balls())  # Add a new ball to start again
                 
     def draw(self):
         screen.fill(BLACK)
@@ -122,6 +159,8 @@ class Game:  # Main controller class
             pygame.draw.line(screen, (20, 20, 20), (0, y), (SCREEN_WIDTH, y))
             
         self.paddle.draw() 
+        for ball in self.balls:
+            ball.draw()
         
         # Draw UI text
         score_text = self.font.render(f"Score: {self.score}", True, WHITE)
@@ -132,7 +171,12 @@ class Game:  # Main controller class
         
         level_text = self.font.render(f"Level: {self.level}", True, WHITE)
         screen.blit(level_text, (SCREEN_WIDTH // 2 - 50, 10))
-        
+        ball = 0
+        for balls in self.balls:
+            if balls.active:
+                ball += 1
+        ball_count_text = self.small_font.render(f"Balls: {ball}", True, WHITE)
+        screen.blit(ball_count_text, (SCREEN_WIDTH - 120, 50))
 
         instructions = self.small_font.render(
             "Use LEFT/RIGHT arrows to move. Catch gold stars to multiply balls!", 
