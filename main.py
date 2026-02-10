@@ -69,6 +69,29 @@ class Paddle:
             
     def get_rect(self):
         return pygame.Rect(self.x, self.y, self.width, self.height)
+    
+    
+class Balls:
+    def __init__(self, x = None, y = None):
+        self.x = x if x is not None else SCREEN_WIDTH // 2
+        self.y = y if y is not None else SCREEN_HEIGHT // 2
+        self.radius = BALL_RADIUS
+        self.speed_x = BALL_SPEED_X * random.choice([-1, 1])
+        self.speed_y = BALL_SPEED_Y
+        self.color = WHITE
+
+    def draw(self):
+        pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
+        pygame.draw.circle(screen, YELLOW, (int(self.x - self.radius // 3), int(self.y - self.radius // 3)), self.radius // 3, 2)
+
+    def move(self):
+        self.x += self.speed_x
+        self.y += self.speed_y
+
+    def get_rect(self):
+        return pygame.Rect(self.x - self.radius, self.y - self.radius, 
+                          2 * self.radius, 2 * self.radius)
+    
 class Game:  # Main controller class
     
     def __init__(self):
