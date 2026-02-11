@@ -75,7 +75,7 @@ class Balls:
         self.x = x if x is not None else SCREEN_WIDTH // 2
         self.y = y if y is not None else SCREEN_HEIGHT // 2
         self.radius = BALL_RADIUS
-        self.speed_x = BALL_SPEED_X * random.choice([-1, 1])
+        self.speed_x = BALL_SPEED_X * random.choice([-1, 0 , 1])
         self.speed_y = BALL_SPEED_Y
         self.color = WHITE
         self.active = True
@@ -150,7 +150,7 @@ class Game:  # Main controller class
         self.paddle = Paddle() 
         self.score = 0 
         self.lives = 3
-        self.level = 1 
+        self.level = 0
         self.game_over = False 
         self.game_won = False
         self.balls = [Balls()]
@@ -179,6 +179,7 @@ class Game:  # Main controller class
                 bounce = relative_intersect_x * 0.8
                 ball.speed_x = -BALL_SPEED_X * relative_intersect_x * 1.5
                 ball.speed_y *= -1.1
+                self.balls.append(Balls())
                 
         for brick in self.bricks:
             if not brick.active:
