@@ -155,6 +155,7 @@ class Game:  # Main controller class
         self.game_won = False
         self.balls = [Balls()]
         self.bricks = []
+        self.cheat_mode = False
         
         self.font = pygame.font.SysFont(None, 36) 
         self.small_font = pygame.font.SysFont(None, 24) 
@@ -179,7 +180,8 @@ class Game:  # Main controller class
                 bounce = relative_intersect_x * 0.8
                 ball.speed_x = -BALL_SPEED_X * relative_intersect_x * 1.5
                 ball.speed_y *= -1.1
-                self.balls.append(Balls())
+                if self.cheat_mode:
+                    self.balls.append(Balls())
                 
             for brick in self.bricks:
                 if brick.active and ball.get_rect().colliderect(brick.get_rect()):
@@ -322,6 +324,9 @@ def main():
                     game = Game()
                 if event.key == pygame.K_ESCAPE:
                     running = False
+                if event.key == pygame.K_c:
+                    game.lives += 997
+                    game.cheat_mode = not game.cheat_mode
                     
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
