@@ -181,8 +181,7 @@ class Game:  # Main controller class
                 ball.speed_x = -BALL_SPEED_X * relative_intersect_x * 1.5
                 ball.speed_y *= -1.1
                 if self.cheat_mode:
-                    self.balls.append(Balls())
-                
+                    self.balls.append(Balls())             
             for brick in self.bricks:
                 if brick.active and ball.get_rect().colliderect(brick.get_rect()):
                     brick_rect = brick.get_rect()
