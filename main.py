@@ -234,8 +234,8 @@ class Game:  # Main controller class
             #     self.game_won = True
             # else:
             self.create_bricks()
-            BALL_SPEED_X *= 1.1  # Increase ball speed  for next level
-            BALL_SPEED_Y *= 1.1
+            BALL_SPEED_X *= 1.05  # Increase ball speed  for next level
+            BALL_SPEED_Y *= 1.05
         
     def draw(self):
         screen.fill(BLACK)
