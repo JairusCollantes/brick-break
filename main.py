@@ -181,19 +181,25 @@ class Game:  # Main controller class
                 ball.speed_y *= -1.1
                 self.balls.append(Balls())
                 
-        for brick in self.bricks:
-            if not brick.active:
-                continue
-            for ball in self.balls:
-                if not ball.active:
-                    continue
-                if ball.get_rect().colliderect(brick.get_rect()):
-                    brick.hit()
-                    self.score += 10
-                    if abs(ball.x - brick.x) < ball.radius or abs(ball.x - (brick.x + brick.width)) < ball.radius:
-                        ball.speed_x *= -1
+            for brick in self.bricks:
+                if brick.active and ball.get_rect().colliderect(brick.get_rect()):
+                    brick_rect = brick.get_rect()
+                    ball_rect = ball.get_rect()
+                    
+                    # Calculate overlap amounts prevents ball from getting stuck in bricks
+                    dx = (ball_rect.centerx - brick_rect.centerx) / (brick_rect.width / 2)
+                    dy = (ball_rect.centery - brick_rect.centery) / (brick_rect.height / 2)
+                    
+                    # Bounce based on which side was hit
+                    if abs(dx) > abs(dy): 
+                        ball.speed_x *= -1 
                     else:
                         ball.speed_y *= -1
+                    
+                    brick.hit() 
+                    self.score += 10 
+                    
+                    break  # Only handle one brick collision per frame
     def update(self):
         if self.game_over or self.game_won:  # If game ended
             return  # Don't update anything
@@ -216,13 +222,18 @@ class Game:  # Main controller class
                 self.game_over = True
             else:
                 self.balls.append(Balls())  # Add a new ball to start again
+                global BALL_SPEED_X, BALL_SPEED_Y
+                BALL_SPEED_X = 5
+                BALL_SPEED_Y = 5
                 
         if all(not brick.active for brick in self.bricks):  # If all bricks are destroyed
             self.level += 1
             # if self.level > 3:  # Win after 3 levels
             #     self.game_won = True
             # else:
-            self.create_bricks()  # Create new bricks for next level
+            self.create_bricks()
+            BALL_SPEED_X *= 1.1  # Increase ball speed  for next level
+            BALL_SPEED_Y *= 1.1
         
     def draw(self):
         screen.fill(BLACK)
