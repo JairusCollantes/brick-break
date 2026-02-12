@@ -75,7 +75,7 @@ class Balls:
         self.x = x if x is not None else SCREEN_WIDTH // 2
         self.y = y if y is not None else SCREEN_HEIGHT // 2
         self.radius = BALL_RADIUS
-        self.speed_x = BALL_SPEED_X * random.choice([-1, 0 , 1])
+        self.speed_x = BALL_SPEED_X * random.randint(-100,100) / 100
         self.speed_y = BALL_SPEED_Y
         self.color = WHITE
         self.active = True
