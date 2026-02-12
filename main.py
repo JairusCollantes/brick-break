@@ -199,7 +199,9 @@ class Game:  # Main controller class
                         ball.speed_y *= -1
                     
                     brick.hit() 
-                    self.score += 10 
+                    self.score += 10
+                    if self.cheat_mode:
+                        self.balls.append(Balls())
                     
                     break  # Only handle one brick collision per frame
     def update(self):
