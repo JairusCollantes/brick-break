@@ -179,7 +179,7 @@ class Game:  # Main controller class
                 relative_intersect_x = (self.paddle.x + (self.paddle.width // 2) - ball.x) / self.paddle.width
                 bounce = relative_intersect_x * 0.8
                 ball.speed_x = -BALL_SPEED_X * relative_intersect_x * 1.5
-                ball.speed_y = (ball.speed_y * -1) + 0.5
+                ball.speed_y = (ball.speed_y * -1) -0.2
                 if self.cheat_mode:
                     self.balls.append(Balls())
                 else:
@@ -240,7 +240,9 @@ class Game:  # Main controller class
             if self.cheat_mode or self.level > 10: # After 10 levels, increase difficulty indefinitely
                 BALL_SPEED_X = BALL_SPEED_X + 0.5
                 BALL_SPEED_Y = BALL_SPEED_Y + 0.5
-        
+            else:
+                BALL_SPEED_X = 5
+                BALL_SPEED_Y = 5
     def draw(self):
         screen.fill(BLACK)
         
