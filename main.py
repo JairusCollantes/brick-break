@@ -237,12 +237,14 @@ class Game:  # Main controller class
             #     self.game_won = True
             # else:
             self.create_bricks()
-            if self.cheat_mode or self.level > 10: # After 10 levels, increase difficulty indefinitely
-                BALL_SPEED_X = BALL_SPEED_X + 0.5
-                BALL_SPEED_Y = BALL_SPEED_Y + 0.5
-            else:
-                BALL_SPEED_X = 5
-                BALL_SPEED_Y = 5
+            if self.level > 10 and not self.cheat_mode:
+                    BALL_SPEED_X = BALL_SPEED_X + 0.5
+                    BALL_SPEED_Y = BALL_SPEED_Y + 0.5
+            for ball in self.balls:
+                if not self.cheat_mode:
+                    ball.active = False
+            self.balls.append(Balls())  # Start next level with a new ball
+
     def draw(self):
         screen.fill(BLACK)
         
