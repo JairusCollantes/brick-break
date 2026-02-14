@@ -179,9 +179,11 @@ class Game:  # Main controller class
                 relative_intersect_x = (self.paddle.x + (self.paddle.width // 2) - ball.x) / self.paddle.width
                 bounce = relative_intersect_x * 0.8
                 ball.speed_x = -BALL_SPEED_X * relative_intersect_x * 1.5
-                ball.speed_y *= -1.1
+                ball.speed_y = (ball.speed_y * -1) + 0.5
                 if self.cheat_mode:
-                    self.balls.append(Balls())             
+                    self.balls.append(Balls())
+                else:
+                    ball.y = self.paddle.y - ball.radius - 1         
             for brick in self.bricks:
                 if brick.active and ball.get_rect().colliderect(brick.get_rect()):
                     brick_rect = brick.get_rect()
@@ -235,8 +237,9 @@ class Game:  # Main controller class
             #     self.game_won = True
             # else:
             self.create_bricks()
-            BALL_SPEED_X *= 1.05  # Increase ball speed  for next level
-            BALL_SPEED_Y *= 1.05
+            if self.cheat_mode or self.level > 10: # After 10 levels, increase difficulty indefinitely
+                BALL_SPEED_X = BALL_SPEED_X + 0.5
+                BALL_SPEED_Y = BALL_SPEED_Y + 0.5
         
     def draw(self):
         screen.fill(BLACK)
@@ -317,9 +320,9 @@ def main():
                 running = False 
                 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT: 
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a: 
                     game.paddle.is_moving_left = True
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                     game.paddle.is_moving_right = True
                 if event.key == pygame.K_r and (game.game_over or game.game_won):
                     game = Game()
@@ -330,9 +333,9 @@ def main():
                     game.cheat_mode = not game.cheat_mode
                     
             if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                     game.paddle.is_moving_left = False
-                if event.key == pygame.K_RIGHT: 
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d: 
                     game.paddle.is_moving_right = False
                     
         # Update all game objects
