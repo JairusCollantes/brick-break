@@ -203,20 +203,37 @@ class Game:  # Main controller class
         self.game_won = False
         self.balls = [Balls()]
         self.bricks = []
+        self.powerups = []
         self.cheat_mode = False
         
         self.font = pygame.font.SysFont(None, 36) 
         self.small_font = pygame.font.SysFont(None, 24) 
     
     def create_bricks(self):
+    
         self.bricks = []
-        colors = [RED, ORANGE, YELLOW, GREEN, CYAN]
-        for row in range(BRICK_ROWS):
-            for col in range(BRICK_COLS):
-                x = col * (BRICK_WIDTH + BRICK_PADDING) + BRICK_PADDING
-                y = row * (BRICK_HEIGHT + BRICK_PADDING) + BRICK_OFFSET_TOP
-                color = colors[row % len(colors)]
-                self.bricks.append(Bricks(x, y, color))
+       
+        rows = min(5 + (self.level - 1), 8)
+        cols = BRICK_COLS
+        
+        red_chance = 0.1 + (self.level - 1) * 0.2
+        base_colors = [PURPLE, GREEN, BLUE, YELLOW]
+        
+        for row in range(rows):
+            for col in range(cols):
+                # Calculate brick position
+                brick_x = col * (BRICK_WIDTH + BRICK_PADDING) + BRICK_PADDING
+                brick_y = row * (BRICK_HEIGHT + BRICK_PADDING) + BRICK_OFFSET_TOP
+
+                if random.random() < red_chance:
+                    color = RED
+                else:
+                    color = random.choice(base_colors)
+                    
+                if random.random() < 0.25:
+                    continue
+                else:
+                    self.bricks.append(Bricks(brick_x, brick_y, color))
     
     def collision_detection(self):
         for ball in self.balls:
