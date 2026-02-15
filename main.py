@@ -144,6 +144,31 @@ class Bricks:
         if self.hit_count >= self.max_hits:
             self.active = False
 
+class PowerUp:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.size = POWERUP_SIZE
+        self.speed = POWERUP_SPEED
+        self.color = POWERUP_COLOR
+        self.active = True
+
+    def draw(self):
+        if self.active:
+            pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.size // 2)
+            pygame.draw.circle(screen, YELLOW, (int(self.x), int(self.y)), self.size // 2, 2)
+
+    def move(self):
+        if not self.active:
+            return
+        self.y += self.speed
+        if self.y >= SCREEN_HEIGHT + self.size:
+            self.active = False
+
+    def get_rect(self):
+        return pygame.Rect(self.x - self.size // 2, self.y - self.size // 2, 
+                          self.size, self.size)
+
 class Game:  # Main controller class
     
     def __init__(self):
