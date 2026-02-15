@@ -145,29 +145,52 @@ class Bricks:
             self.active = False
 
 class PowerUp:
+    
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.size = POWERUP_SIZE
-        self.speed = POWERUP_SPEED
-        self.color = POWERUP_COLOR
+        self.speed = POWERUP_SPEED 
+        self.color = POWERUP_COLOR 
+        self.type = "multiball" # Why type? Only one type for now, but could expand later
         self.active = True
-
+        
     def draw(self):
-        if self.active:
-            pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.size // 2)
-            pygame.draw.circle(screen, YELLOW, (int(self.x), int(self.y)), self.size // 2, 2)
-
-    def move(self):
         if not self.active:
             return
-        self.y += self.speed
-        if self.y >= SCREEN_HEIGHT + self.size:
-            self.active = False
+        
+        # Star for multiball power-up like wtf why is it so hard to draw a star in pygame
+        points = [] 
+        for i in range(5):
+            angle = 2 * 3.14159 * i / 5 - 3.14159 / 2
 
+            outer_x = self.x + self.size * 0.9 * pygame.math.Vector2(1, 0).rotate(angle * 57.3).x
+            outer_y = self.y + self.size * 0.9 * pygame.math.Vector2(1, 0).rotate(angle * 57.3).y
+            points.append((outer_x, outer_y))
+            
+            inner_angle = angle + 3.14159 / 5
+
+            inner_x = self.x + self.size * 0.4 * pygame.math.Vector2(1, 0).rotate(inner_angle * 57.3).x
+            inner_y = self.y + self.size * 0.4 * pygame.math.Vector2(1, 0).rotate(inner_angle * 57.3).y
+            points.append((inner_x, inner_y))
+            
+        pygame.draw.polygon(screen, self.color, points)
+        
+        font = pygame.font.SysFont(None, 18) 
+        text = font.render("3x", True, BLACK)
+        screen.blit(text, (self.x - 8, self.y - 5))
+        
+    def move(self):
+        self.y += self.speed
+        
+        if self.y > SCREEN_HEIGHT:
+            self.active = False 
+            
     def get_rect(self):
-        return pygame.Rect(self.x - self.size // 2, self.y - self.size // 2, 
-                          self.size, self.size)
+        return pygame.Rect(self.x - self.size//2,
+                          self.y - self.size//2,
+                          self.size,
+                          self.size)
 
 class Game:  # Main controller class
     
