@@ -272,7 +272,17 @@ class Game:  # Main controller class
                     if self.cheat_mode:
                         self.balls.append(Balls())
                     
+                    if brick.active == False and random.random() < POWERUP_CHANCE:
+                        self.powerups.append(PowerUp(brick.x + brick.width // 2, brick.y + brick.height // 2))
+                    
                     break  # Only handle one brick collision per frame
+            for powerup in self.powerups:
+                if powerup.active and ball.get_rect().colliderect(powerup.get_rect()):
+                    powerup.active = False
+                    if powerup.type == "multiball":
+                        for _ in range(2):  # Add 2 extra balls
+                            self.balls.append(Balls(ball.x, ball.y))
+                            
     def update(self):
         if self.game_over or self.game_won:  # If game ended
             return  # Don't update anything
