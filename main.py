@@ -276,6 +276,7 @@ class Game:  # Main controller class
                         self.powerups.append(PowerUp(brick.x + brick.width // 2, brick.y + brick.height // 2))
                     
                     break  # Only handle one brick collision per frame
+                
             for powerup in self.powerups:
                 if powerup.active and ball.get_rect().colliderect(powerup.get_rect()):
                     powerup.active = False
