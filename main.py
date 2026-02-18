@@ -219,7 +219,7 @@ class Game:  # Main controller class
         total_width = cols * BRICK_WIDTH + (cols - 1) * BRICK_PADDING
         start_x = (SCREEN_WIDTH - total_width) // 2
         
-        red_chance = 0.1 + (self.level - 1) * 0.2
+        red_chance = 0.1 + (self.level - 10) * 0.2
         base_colors = [PURPLE, GREEN, BLUE, YELLOW]
         
         for row in range(rows):
