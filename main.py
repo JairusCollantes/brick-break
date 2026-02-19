@@ -278,11 +278,12 @@ class Game:  # Main controller class
                     break  # Only handle one brick collision per frame
                 
             for powerup in self.powerups:
-                if powerup.active and ball.get_rect().colliderect(powerup.get_rect()):
+                if powerup.active and self.paddle.get_rect().colliderect(powerup.get_rect()):
                     powerup.active = False
                     if powerup.type == "multiball":
                         for _ in range(2):  # Add 2 extra balls
-                            self.balls.append(Balls(ball.x, ball.y))
+                            for ball in self.balls:
+                                self.balls.append(Balls(ball.x, ball.y))
                             
     def update(self):
         if self.game_over or self.game_won:  # If game ended
@@ -291,6 +292,8 @@ class Game:  # Main controller class
         # Move paddle based on key states
         self.paddle.move()
         
+        for powerup in self.powerups:
+            powerup.move()
         
         for ball in self.balls:
             ball.move()
@@ -339,6 +342,9 @@ class Game:  # Main controller class
         
         for brick in self.bricks:
             brick.draw()
+        
+        for powerup in self.powerups:
+            powerup.draw()
         
         # Draw UI text
         score_text = self.font.render(f"Score: {self.score}", True, WHITE)
