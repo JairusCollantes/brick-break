@@ -282,7 +282,8 @@ class Game:  # Main controller class
                     powerup.active = False
                     if powerup.type == "multiball":
                         for _ in range(2):  # Add 2 extra balls
-                            for ball in self.balls:
+                            temp = self.balls
+                            for ball in temp:
                                 self.balls.append(Balls(ball.x, ball.y))
                             
     def update(self):
