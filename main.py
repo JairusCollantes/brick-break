@@ -276,15 +276,16 @@ class Game:  # Main controller class
                         self.powerups.append(PowerUp(brick.x + brick.width // 2, brick.y + brick.height // 2))
                     
                     break  # Only handle one brick collision per frame
-                
-            for powerup in self.powerups:
-                if powerup.active and self.paddle.get_rect().colliderect(powerup.get_rect()):
-                    powerup.active = False
-                    if powerup.type == "multiball":
-                        for _ in range(2):  # Add 2 extra balls
-                            temp = self.balls
-                            for ball in temp:
-                                self.balls.append(Balls(ball.x, ball.y))
+        temp = []
+        for powerup in self.powerups:
+            if powerup.active and self.paddle.get_rect().colliderect(powerup.get_rect()):
+                powerup.active = False
+                if powerup.type == "multiball":
+                    for ball in temp:
+                        if ball is ball.active:
+                            for _ in range(2):  # Add 2 extra balls
+                                temp.append(Balls(ball.x, ball.y))
+        self.balls.extend(temp)
                             
     def update(self):
         if self.game_over or self.game_won:  # If game ended
